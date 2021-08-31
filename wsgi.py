@@ -3,9 +3,7 @@ import os
 from config import DevConfig, ProdConfig
 from src.app import create_api, parse_args
 
-def main(enable_prod: bool):
-    # os.environ['FLASK_CONFIG'] = 'production' if (ennable_prod is True) else 'development'
-    
+def main(enable_prod: bool):    
     if enable_prod: 
         host = '0.0.0.0'
         port = 5900
