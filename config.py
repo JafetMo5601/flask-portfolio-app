@@ -8,7 +8,8 @@ class Config(object):
     SECRET_KEY = os.environ.get('PORTFOLIO_SECRET_KEY') 
     FLASK_SECRET = SECRET_KEY
     JWT_SECRET_KEY = SECRET_KEY
-    DB_HOST = os.environ.get('PORTFOLIO_DB_HOST')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///portfolio.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class DevConfig(Config):
