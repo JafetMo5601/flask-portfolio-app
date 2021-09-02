@@ -1,27 +1,22 @@
 from flask_jwt_extended import JWTManager
-from pymongo import MongoClient
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask import Flask
 import argparse
 
 
-def connection():
-    # client = MongoClient('mongodb://' + os.environ.get('PORTFOLIO_DB_HOST') + ':27017/')
-    client = MongoClient('mongodb://localhost:27017/')
-    
-    db = client['portfolio']    
-    return db
-
-
-def get_collection(collection_name):
-    user = connection()[collection_name]
-    return user
+db = SQLAlchemy()
 
 
 def create_api(config):
     app = Flask(__name__)
     JWTManager(app)
-    
+
     app.config.from_object(config)
+    db.init_app(app)    
+    migrate = Migrate(app, db)
+    
+    from src.models import models
     
     from src.blueprints.admin import admin_bp
     app.register_blueprint(admin_bp)
