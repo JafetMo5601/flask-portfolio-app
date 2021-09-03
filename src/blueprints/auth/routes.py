@@ -1,14 +1,12 @@
 from flask import jsonify, request
 from flask_jwt_extended import create_access_token
 
-from src.app import get_collection
+from src import get_collection
 from . import auth_bp
-from src import app
 
 
 @auth_bp.route('/register/', methods=['POST'])
 def register():
-
     email = request.json['email']
     is_email_registered = get_collection('users').find_one({'email': email})
 
