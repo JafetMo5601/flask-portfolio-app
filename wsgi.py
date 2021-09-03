@@ -1,7 +1,7 @@
 import os
 
 from config import DevConfig, ProdConfig
-from src.app import create_api, parse_args
+from src import create_api, parse_args
 
 def main(enable_prod: bool):    
     if enable_prod: 
