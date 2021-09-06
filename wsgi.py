@@ -8,7 +8,6 @@ def main(enable_prod: bool):
         host = '0.0.0.0'
         port = 5900
         api = create_api(ProdConfig)
-        
     else: 
         host = '127.0.0.1'
         port = 3000
