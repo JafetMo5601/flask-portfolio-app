@@ -9,13 +9,13 @@ class Config(object):
     FLASK_SECRET = SECRET_KEY
     JWT_SECRET_KEY = SECRET_KEY
     SQLALCHEMY_DATABASE_URI = 'sqlite:///portfolio.db'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
 class DevConfig(Config):
     DEBUG = True
     DEVELOPMENT = True
-
+    
 
 class ProdConfig(Config):
     DEBUG = False
