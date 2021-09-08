@@ -1,4 +1,5 @@
 from werkzeug.utils import secure_filename
+from flask import current_app
 import os
 
 from src.models.projects import Project
@@ -94,9 +95,9 @@ def update_project(id, title, description, tools, image):
         return 'Project not found', 404
 
 
-def add_award(title, description):
+def add_award(title, description, year):
     try:
-        award = Award(title=title, description=description)
+        award = Award(title=title, description=description, year=year)
         db.session.add(award)
         db.session.commit()
         return 'Award added succesfully.', 200
@@ -128,7 +129,7 @@ def update_award(id, title, description):
 
 
 def save_image(image, is_photo=False):
-    image_path = os.getcwd() + '\\src\\files_storage\\images\\info'
+    image_path = current_app.config['UPLOAD_FOLDER'] + 'images\\info'
 
     if image and image.filename != '':
         if is_photo:
@@ -144,7 +145,7 @@ def save_image(image, is_photo=False):
     
 
 def save_resume(resume):
-    resume_path = os.getcwd() + '\\src\\files_storage\\resume'
+    resume_path = current_app.config['UPLOAD_FOLDER'] + 'resume'
 
     if resume and resume.filename != '':
         resume_name = change_resume_name(secure_filename(resume.filename))
@@ -172,39 +173,39 @@ def change_resume_name(old_name):
 
 
 def retrieve_cover():
-    cover_path = os.getcwd() + '\\src\\files_storage\\images\\info\\'
+    cover_path = current_app.config['UPLOAD_FOLDER'] + 'images\\info\\'
     cover_name = [name for name in os.listdir(cover_path) if 'cover' in name]
     cover_path += cover_name[0] 
     return cover_path
 
 
 def retrieve_photo():
-    photo_path = os.getcwd() + '\\src\\files_storage\\images\\info\\'
+    photo_path = current_app.config['UPLOAD_FOLDER'] + 'images\\info\\'
     photo_name = [name for name in os.listdir(photo_path) if 'photo' in name]
     photo_path += photo_name[0] 
     return photo_path
 
 
 def retrieve_resume():
-    resume_path = os.getcwd() + '\\src\\files_storage\\resume\\'
+    resume_path = current_app.config['UPLOAD_FOLDER'] + 'resume\\'
     resume_name = [name for name in os.listdir(resume_path) if 'resume' in name]
     resume_path += resume_name[0] 
     return resume_path
 
 
 def remove_cover():
-    cover_path = os.getcwd() + '\\src\\files_storage\\images\\info\\'
+    cover_path = current_app.config['UPLOAD_FOLDER'] + 'images\\info\\'
     cover_name = [name for name in os.listdir(cover_path) if 'cover' in name]
     os.remove(cover_path + cover_name[0])
 
 
 def remove_photo():
-    photo_path = os.getcwd() + '\\src\\files_storage\\images\\info\\'
+    photo_path = current_app.config['UPLOAD_FOLDER'] + 'images\\info\\'
     photo_name = [name for name in os.listdir(photo_path) if 'photo' in name]
     os.remove(photo_path + photo_name[0])
 
 
 def remove_resume():
-    resume_path = os.getcwd() + '\\src\\files_storage\\resume\\'
+    resume_path = current_app.config['UPLOAD_FOLDER'] + 'resume\\'
     resume_name = [name for name in os.listdir(resume_path) if 'resume' in name]
     os.remove(resume_path + resume_name[0])

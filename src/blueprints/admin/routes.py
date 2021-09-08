@@ -98,7 +98,8 @@ def update_project(id):
 def add_award():
     title = request.json['title']
     description = request.json['description']
-    response = admin.add_award(title, description)
+    year = request.json['year']
+    response = admin.add_award(title, description, year)
     return jsonify(response=response[0]), response[1]
 
 
