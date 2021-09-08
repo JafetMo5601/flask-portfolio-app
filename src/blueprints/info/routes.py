@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 
 from src.blueprints.info import info
 from . import info_bp
@@ -20,3 +20,21 @@ def user_projects():
 def user_awards():
     response = info.get_awards()
     return jsonify(response=response[0]), response[1]
+
+
+@info_bp.route('/resume/', methods=['GET'])
+def user_resume():
+    response = info.get_resume()
+    return response
+
+
+@info_bp.route('/cover/', methods=['GET'])
+def user_cover():
+    response = info.get_cover()
+    return response
+
+
+@info_bp.route('/photo/', methods=['GET'])
+def user_photo():
+    response = info.get_photo()
+    return response
