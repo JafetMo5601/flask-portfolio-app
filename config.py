@@ -10,7 +10,7 @@ class Config(object):
     JWT_SECRET_KEY = SECRET_KEY
     SQLALCHEMY_DATABASE_URI = 'sqlite:///portfolio.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-
+    UPLOAD_FOLDER = os.getcwd() + '\\src\\files_storage\\'
 
 class DevConfig(Config):
     DEBUG = True
