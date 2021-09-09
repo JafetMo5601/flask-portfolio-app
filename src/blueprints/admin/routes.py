@@ -23,7 +23,7 @@ def add_info():
     fb = request.form['facebook']
 
     cover_path = admin.save_image(cover)
-    photo_path = admin.save_image(photo, True)
+    photo_path = admin.save_image(photo, is_photo=True)
     resume_path = admin.save_resume(resume)
     
     response = admin.add_info(
@@ -48,8 +48,8 @@ def update_info(id):
     insta = request.form['instagram']
     fb = request.form['facebook']
     
-    cover = admin.retrieve_cover() if (cover == '') else admin.save_image(cover)
-    photo = admin.retrieve_photo() if (photo == '') else admin.save_image(photo, True)
+    cover = admin.retrieve_image('cover', 'info') if (cover == '') else admin.save_image(cover)
+    photo = admin.retrieve_image('photo', 'info') if (photo == '') else admin.save_image(photo, is_photo=True)
     resume = admin.retrieve_resume() if (resume == '') else admin.save_resume(resume)
 
     response = admin.update_info(
@@ -67,11 +67,14 @@ def remove_info(id):
 @admin_bp.route('/add-project/', methods=['POST'])
 @jwt_required()
 def add_project():
-    title = request.json['title']
-    description = request.json['description']
-    tools = request.json['tools']
-    image = request.json['image'] if (request.files.get('image')) else ''
-    response = admin.add_project(title, description, tools, image)
+    title = request.form['title']
+    description = request.form['description']
+    tools = request.form['tools']
+    image = request.files['image'] if (request.files.get('image')) else ''
+    
+    image_path = admin.save_image(image, is_project=True, project_name=title)
+    
+    response = admin.add_project(title, description, tools, image_path)
     return jsonify(response=response[0]), response[1]
 
 
@@ -85,11 +88,14 @@ def remove_project(id):
 @admin_bp.route('/update-project/<int:id>/', methods=['PUT'])
 @jwt_required()
 def update_project(id):
-    title = request.json['title']
-    description = request.json['description']
-    tools = request.json['tools']
-    image = request.json['image']
-    response = admin.update_project(id, title, description, tools, image)
+    title = request.form['title']
+    description = request.form['description']
+    tools = request.form['tools']
+    image = request.files['image']
+    
+    image_path = admin.retrieve_image(title, 'projects') if (photo == '') else admin.save_image(image, is_project=True, project_name=title)
+    
+    response = admin.update_project(id, title, description, tools, image_path)
     return jsonify(response=response[0]), response[1]
 
 

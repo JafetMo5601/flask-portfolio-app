@@ -26,8 +26,8 @@ def remove_info(id):
     if Info.query.filter(Info.id == id).first() is not None:
         Info.query.filter(Info.id == id).delete()
         db.session.commit()
-        remove_cover()
-        remove_photo()
+        remove_image('cover', 'info')
+        remove_image('photo', 'info')
         remove_resume()
         return 'Info removed successfully', 200
     else:
@@ -61,6 +61,8 @@ def update_info(
 
 def add_project(title, description, tools, image):
     try:
+        if image == '':
+            return 'Bad request.' , 400
         project = Project(title=title, description=description,
                           image_path=image, tools=tools)
         db.session.add(project)
@@ -71,9 +73,11 @@ def add_project(title, description, tools, image):
 
 
 def remove_project(id):
-    if Project.query.filter(Project.id == id).first() is not None:
+    project = Project.query.filter(Project.id == id).first()
+    if project is not None:
         Project.query.filter(Project.id == id).delete()
         db.session.commit()
+        remove_image(project.title.replace(' ', '_'), 'projects')
         return 'Project removed successfully', 200
     else:
         return 'Project not found', 404
@@ -128,15 +132,18 @@ def update_award(id, title, description):
         return 'Award not found', 404
 
 
-def save_image(image, is_photo=False):
-    image_path = current_app.config['UPLOAD_FOLDER'] + 'images\\info'
-
+def save_image(image, is_project=False, project_name='', is_photo=False):    
     if image and image.filename != '':
-        if is_photo:
-            image_name = change_photo_name(secure_filename(image.filename))
+        if is_project:
+            image_name = change_file_name(secure_filename(image.filename), project_name.replace(' ', '_'))
+            directory = 'projects'
+        elif is_photo:
+            image_name = change_file_name(secure_filename(image.filename), 'photo')
+            directory = 'info'
         else:
-            image_name = change_cover_name(secure_filename(image.filename))
-
+            image_name = change_file_name(secure_filename(image.filename), 'cover')
+            directory = 'info'
+        image_path = current_app.config['UPLOAD_FOLDER'] + 'images\\' + directory
         image_path = os.path.join(image_path, image_name)
         image.save(image_path)
         return image_path
@@ -148,42 +155,17 @@ def save_resume(resume):
     resume_path = current_app.config['UPLOAD_FOLDER'] + 'resume'
 
     if resume and resume.filename != '':
-        resume_name = change_resume_name(secure_filename(resume.filename))
+        resume_name = change_file_name(secure_filename(resume.filename), 'resume')
         resume_path = os.path.join(resume_path, resume_name)
         resume.save(resume_path)
-        print(resume_path)
         return resume_path
     else:
         return ''
 
 
-def change_photo_name(old_name):
+def change_file_name(old_name, new_name):
     ext = os.path.splitext(old_name)[1]
-    return 'photo' + ext
-
-
-def change_cover_name(old_name):
-    ext = os.path.splitext(old_name)[1]
-    return 'cover' + ext
-
-
-def change_resume_name(old_name):
-    ext = os.path.splitext(old_name)[1]
-    return 'resume' + ext
-
-
-def retrieve_cover():
-    cover_path = current_app.config['UPLOAD_FOLDER'] + 'images\\info\\'
-    cover_name = [name for name in os.listdir(cover_path) if 'cover' in name]
-    cover_path += cover_name[0] 
-    return cover_path
-
-
-def retrieve_photo():
-    photo_path = current_app.config['UPLOAD_FOLDER'] + 'images\\info\\'
-    photo_name = [name for name in os.listdir(photo_path) if 'photo' in name]
-    photo_path += photo_name[0] 
-    return photo_path
+    return new_name + ext
 
 
 def retrieve_resume():
@@ -193,16 +175,18 @@ def retrieve_resume():
     return resume_path
 
 
-def remove_cover():
-    cover_path = current_app.config['UPLOAD_FOLDER'] + 'images\\info\\'
-    cover_name = [name for name in os.listdir(cover_path) if 'cover' in name]
-    os.remove(cover_path + cover_name[0])
+def retrieve_image(image_name, image_type):
+    image_path = current_app.config['UPLOAD_FOLDER'] + 'images\\' + image_type + '\\'
+    image_name = [name for name in os.listdir(image_path) if image_name.replace(' ', '_') in name]
+    image_path += image_name[0] 
+    return image_path
 
 
-def remove_photo():
-    photo_path = current_app.config['UPLOAD_FOLDER'] + 'images\\info\\'
-    photo_name = [name for name in os.listdir(photo_path) if 'photo' in name]
-    os.remove(photo_path + photo_name[0])
+def remove_image(image_name, image_type):
+    image_path = current_app.config['UPLOAD_FOLDER'] + 'images\\' + image_type + '\\'
+    image_name = [name for name in os.listdir(image_path) if image_name.replace(' ', '_') in name]
+    print(image_name)
+    os.remove(image_path + image_name[0])
 
 
 def remove_resume():
