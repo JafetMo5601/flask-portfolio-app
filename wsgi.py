@@ -1,7 +1,7 @@
 import os
 
 from config import DevConfig, ProdConfig
-from src import create_api, parse_args
+from src import create_api
 
 if (os.getenv('ENVIRONMENT', 'prod') == 'env'): 
     api = create_api(DevConfig)
