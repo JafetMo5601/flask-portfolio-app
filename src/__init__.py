@@ -28,14 +28,3 @@ def create_api(config):
     from src import models
 
     return app
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description='Portfolio')
-    parser.add_argument(
-        '--enable-prod',
-        action='store_true',
-        default=False,
-        help='Flag for production deployment. Warning: This will disable debugging mode.'
-    )
-    return parser.parse_args()
