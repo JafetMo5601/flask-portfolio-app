@@ -10,15 +10,13 @@ def register():
     email = request.json['email']
 
     if auth.is_email_registered(email):
-        return jsonify(message='Email already registered'), 409
+        return jsonify(response = 'Conflict.', message = 'Email already registered'), 409
     else:
         first = request.json['first']
         last = request.json['last']
         password = request.json['password']
-
         auth.is_email_registered(first, last, email, password)
-
-        return jsonify(message='User registered sucessfully'), 201
+        return jsonify(response = 'Created.', message='User registered sucessfully'), 201
 
 
 @auth_bp.route('/login/', methods=['POST'])
@@ -27,7 +25,7 @@ def login():
     password = request.json['password']
 
     if auth.are_credentials_valid(email, password):
-        access_token = create_access_token(identity=email)
-        return jsonify(message='Login Succeeded!', access_token=access_token), 201
+        JWT = create_access_token(identity=email)
+        return jsonify(response = 'Ok.', message = 'Login Succeeded!', JWT = JWT), 200
     else:
-        return jsonify(message='Bad Email or Password'), 401
+        return jsonify(response = 'Unauthorized.', message='Bad Email or Password'), 401

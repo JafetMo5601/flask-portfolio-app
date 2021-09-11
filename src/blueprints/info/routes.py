@@ -25,16 +25,12 @@ def user_awards():
 @info_bp.route('/resume/', methods=['GET'])
 def user_resume():
     response = info.get_resume()
-    return response
+    return jsonify(response[0]), response[1]
 
 
-@info_bp.route('/cover/', methods=['GET'])
-def user_cover():
-    response = info.get_cover()
-    return response
-
-
-@info_bp.route('/photo/', methods=['GET'])
-def user_photo():
-    response = info.get_photo()
-    return response
+@info_bp.route('/retrieve-image/', methods=['GET'])
+def project_image():
+    image_name =  request.json['image_name']
+    image_type =  request.json['image_type']
+    response = info.get_image(image_name, image_type)
+    return response[0], response[1]

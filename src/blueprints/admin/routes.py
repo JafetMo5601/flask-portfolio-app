@@ -4,16 +4,16 @@ from flask import jsonify, request
 
 from src.blueprints.admin import admin
 from . import admin_bp
-    
-    
+
+
 @admin_bp.route('/add-info/', methods=['POST'])
 @jwt_required()
 def add_info():
     about = request.form['about']
     description = request.form['description']
-    cover = request.files['cover'] if (request.files.get('cover')) else ''
-    photo = request.files['photo'] if (request.files.get('photo')) else ''
-    resume = request.files['resume'] if (request.files.get('resume')) else ''
+    cover_img = request.files['cover'] if (request.files.get('cover')) else ''
+    photo_img = request.files['photo'] if (request.files.get('photo')) else ''
+    resume_file = request.files['resume'] if (request.files.get('resume')) else ''
     phone = request.form['phone']
     email = request.form['email']
     direction = request.form['direction']
@@ -21,20 +21,14 @@ def add_info():
     gh = request.form['github']
     insta = request.form['instagram']
     fb = request.form['facebook']
-
-    cover_path = admin.save_image(cover)
-    photo_path = admin.save_image(photo, is_photo=True)
-    resume_path = admin.save_resume(resume)
-    
     response = admin.add_info(
-        about, description, cover_path, photo_path, resume_path, phone, email, direction, linkedin, gh, insta, fb)
-
+        about, description, cover_img, photo_img, resume_file, phone, email, direction, linkedin, gh, insta, fb)
     return jsonify(response=response[0]), response[1]
 
 
-@admin_bp.route('/update-info/<int:id>/', methods=['PUT'])
+@admin_bp.route('/update-info/', methods=['PUT'])
 @jwt_required()
-def update_info(id):
+def update_info():
     about = request.form['about']
     description = request.form['description']
     cover = request.files['cover'] if (request.files.get('cover')) else ''
@@ -47,20 +41,15 @@ def update_info(id):
     gh = request.form['github']
     insta = request.form['instagram']
     fb = request.form['facebook']
-    
-    cover = admin.retrieve_image('cover', 'info') if (cover == '') else admin.save_image(cover)
-    photo = admin.retrieve_image('photo', 'info') if (photo == '') else admin.save_image(photo, is_photo=True)
-    resume = admin.retrieve_resume() if (resume == '') else admin.save_resume(resume)
-
-    response = admin.update_info(
-        id, about, description, cover, photo, resume, phone, email, direction, linkedin, gh, insta, fb)
+    response = admin.update_info(about, description, cover, photo,
+                                 resume, phone, email, direction, linkedin, gh, insta, fb)
     return jsonify(response=response[0]), response[1]
 
 
-@admin_bp.route('/remove-info/<int:id>/', methods=['DELETE'])
+@admin_bp.route('/remove-info/', methods=['DELETE'])
 @jwt_required()
-def remove_info(id):
-    response = admin.remove_info(id)
+def remove_info():
+    response = admin.remove_info()
     return jsonify(response=response[0]), response[1]
 
 
@@ -71,17 +60,7 @@ def add_project():
     description = request.form['description']
     tools = request.form['tools']
     image = request.files['image'] if (request.files.get('image')) else ''
-    
-    image_path = admin.save_image(image, is_project=True, project_name=title)
-    
-    response = admin.add_project(title, description, tools, image_path)
-    return jsonify(response=response[0]), response[1]
-
-
-@admin_bp.route('/remove-project/<int:id>/', methods=['DELETE'])
-@jwt_required()
-def remove_project(id):
-    response = admin.remove_project(id)
+    response = admin.add_project(title, description, tools, image)
     return jsonify(response=response[0]), response[1]
 
 
@@ -92,10 +71,14 @@ def update_project(id):
     description = request.form['description']
     tools = request.form['tools']
     image = request.files['image']
-    
-    image_path = admin.retrieve_image(title, 'projects') if (photo == '') else admin.save_image(image, is_project=True, project_name=title)
-    
-    response = admin.update_project(id, title, description, tools, image_path)
+    response = admin.update_project(id, title, description, tools, image)
+    return jsonify(response=response[0]), response[1]
+
+
+@admin_bp.route('/remove-project/<int:id>/', methods=['DELETE'])
+@jwt_required()
+def remove_project(id):
+    response = admin.remove_project(id)
     return jsonify(response=response[0]), response[1]
 
 
@@ -109,6 +92,15 @@ def add_award():
     return jsonify(response=response[0]), response[1]
 
 
+@admin_bp.route('/update-award/<int:id>/', methods=['PUT'])
+@jwt_required()
+def update_award(id):
+    title = request.json['title']
+    description = request.json['description']
+    response = admin.update_award(id, title, description)
+    return jsonify(response=response[0]), response[1]
+
+
 @admin_bp.route('/remove-award/<int:id>/', methods=['DELETE'])
 @jwt_required()
 def remove_award(id):
@@ -116,10 +108,9 @@ def remove_award(id):
     return jsonify(response=response[0]), response[1]
 
 
-@admin_bp.route('/update-award/<int:id>/', methods=['PUT'])
+@admin_bp.route('/add-award-cover/', methods=['POST'])
 @jwt_required()
-def update_award(id):
-    title = request.json['title']
-    description = request.json['description']
-    response = admin.update_award(id, title, description)
+def add_award_cover():
+    image = request.files['award-image']
+    response = admin.add_award_cover(image)
     return jsonify(response=response[0]), response[1]

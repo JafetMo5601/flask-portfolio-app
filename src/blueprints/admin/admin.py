@@ -1,5 +1,6 @@
 from werkzeug.utils import secure_filename
 from flask import current_app
+import requests
 import os
 
 from src.models.projects import Project
@@ -11,33 +12,34 @@ from src import db
 def add_info(
         about, description, cover, photo, resume, phone, email, direction, linkedin, gh, insta, fb):
     try:
-        if cover == '' or photo == '' or resume == '':
-            return 'Bad request.', 400
-        info = Info(
-            about=about, description=description, cover=cover, photo=photo, resume_path=resume, phone=phone, email=email, direction=direction, linkedin_url=linkedin, github_url=gh, instagram_url=insta, facebook_url=fb)
-        db.session.add(info)
-        db.session.commit()
-        return 'Info added succesfully.', 200
+        if not there_is_info():
+            if cover == '' or photo == '' or resume == '':
+                return 'Bad request.', 400
+            
+            cover_path = save_image(cover, 'info', 'cover')
+            photo_path = save_image(photo, 'info', 'photo')
+            resume_path = save_resume(resume)
+            
+            info = Info(
+                about=about, description=description, cover=cover_path, photo=photo_path, resume_path=resume_path, phone=phone, email=email, direction=direction, linkedin_url=linkedin, github_url=gh, instagram_url=insta, facebook_url=fb)
+            db.session.add(info)
+            db.session.commit()
+            return 'Ok.', 200
+        else:
+            return 'Conflict.', 409
     except:
         return 'There was an internal server error.', 500
 
 
-def remove_info(id):
-    if Info.query.filter(Info.id == id).first() is not None:
-        Info.query.filter(Info.id == id).delete()
-        db.session.commit()
-        remove_image('cover', 'info')
-        remove_image('photo', 'info')
-        remove_resume()
-        return 'Info removed successfully', 200
-    else:
-        return 'Info not found', 404
-
-
 def update_info(
-        id, about, description, cover, photo, resume, phone, email, direction, linkedin, gh, insta, fb):
-    if Info.query.filter(Info.id == id).first() is not None:
-        Info.query.filter(Info.id == id).update(
+        about, description, cover, photo, resume, phone, email, direction, linkedin, gh, insta, fb):
+    if Info.query.filter(Info.id == 1).first() is not None:
+        
+        cover = retrieve_image('cover', 'info') if (cover == '') else save_image(cover, 'info', 'cover')
+        photo = retrieve_image('photo', 'info') if (photo == '') else save_image(photo, 'info', 'photo')
+        resume = retrieve_resume() if (resume == '') else save_resume(resume)
+        
+        Info.query.filter(Info.id == 1).update(
             {
                 Info.about: about,
                 Info.description: description,
@@ -54,22 +56,54 @@ def update_info(
             }
         )
         db.session.commit()
-        return 'Info updated successfully', 200
+        return 'Ok', 200
     else:
-        return 'Info not found', 404
+        return 'Not found', 404
+
+
+def remove_info():
+    if Info.query.filter(Info.id == 1).first() is not None:
+        Info.query.filter(Info.id == 1).delete()
+        db.session.commit()
+        remove_image('cover', 'info')
+        remove_image('photo', 'info')
+        remove_resume()
+        return 'Ok', 200
+    else:
+        return 'Not found', 404
 
 
 def add_project(title, description, tools, image):
     try:
-        if image == '':
+        if image == None:
             return 'Bad request.' , 400
+        image_path = save_image(image, 'projects', title)
         project = Project(title=title, description=description,
-                          image_path=image, tools=tools)
+                          image_path=image_path, tools=tools)
         db.session.add(project)
         db.session.commit()
-        return 'Project added succesfully.', 200
+        return 'Ok.', 200
     except:
         return 'There was an internal server error.', 500
+
+
+def update_project(id, title, description, tools, image):
+    if Project.query.filter(Project.id == id).first() is not None:
+        
+        image_path = retrieve_image(title, 'projects') if (image == '') else save_image(image, 'projects', title)
+        
+        Project.query.filter(Project.id == id).update(
+            {
+                Project.title: title,
+                Project.description: description,
+                Project.tools: tools,
+                Project.image_path: image_path
+            }
+        )
+        db.session.commit()
+        return 'Ok.', 200
+    else:
+        return 'Not found', 404
 
 
 def remove_project(id):
@@ -78,25 +112,9 @@ def remove_project(id):
         Project.query.filter(Project.id == id).delete()
         db.session.commit()
         remove_image(project.title.replace(' ', '_'), 'projects')
-        return 'Project removed successfully', 200
+        return 'Ok.', 200
     else:
-        return 'Project not found', 404
-
-
-def update_project(id, title, description, tools, image):
-    if Project.query.filter(Project.id == id).first() is not None:
-        Project.query.filter(Project.id == id).update(
-            {
-                Project.title: title,
-                Project.description: description,
-                Project.tools: tools,
-                Project.image_path: image
-            }
-        )
-        db.session.commit()
-        return 'Project updated successfully', 200
-    else:
-        return 'Project not found', 404
+        return 'Not found', 404
 
 
 def add_award(title, description, year):
@@ -104,7 +122,7 @@ def add_award(title, description, year):
         award = Award(title=title, description=description, year=year)
         db.session.add(award)
         db.session.commit()
-        return 'Award added succesfully.', 200
+        return 'Ok.', 200
     except:
         return 'There was an internal server error.', 500
 
@@ -113,9 +131,9 @@ def remove_award(id):
     if Award.query.filter(Award.id == id).first() is not None:
         Award.query.filter(Award.id == id).delete()
         db.session.commit()
-        return 'Award removed successfully', 200
+        return 'Ok.', 200
     else:
-        return 'Award not found', 404
+        return 'Not found', 404
 
 
 def update_award(id, title, description):
@@ -127,23 +145,15 @@ def update_award(id, title, description):
             }
         )
         db.session.commit()
-        return 'Award updated successfully', 200
+        return 'Ok.', 200
     else:
-        return 'Award not found', 404
+        return 'Not found.', 404
 
 
-def save_image(image, is_project=False, project_name='', is_photo=False):    
+def save_image(image, image_type, image_name):    
     if image and image.filename != '':
-        if is_project:
-            image_name = change_file_name(secure_filename(image.filename), project_name.replace(' ', '_'))
-            directory = 'projects'
-        elif is_photo:
-            image_name = change_file_name(secure_filename(image.filename), 'photo')
-            directory = 'info'
-        else:
-            image_name = change_file_name(secure_filename(image.filename), 'cover')
-            directory = 'info'
-        image_path = current_app.config['UPLOAD_FOLDER'] + 'images\\' + directory
+        image_name = change_file_name(secure_filename(image.filename), image_name.replace(' ', '_'))
+        image_path = current_app.config['UPLOAD_FOLDER'] + 'images\\' + image_type
         image_path = os.path.join(image_path, image_name)
         image.save(image_path)
         return image_path
@@ -161,6 +171,18 @@ def save_resume(resume):
         return resume_path
     else:
         return ''
+
+
+def add_award_cover(image):
+    try:
+        awards_path = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images\\awards')
+        if len(os.listdir(awards_path)) > 1:
+            file = [file for file in os.listdir(awards_path) if 'awards' in file]
+            os.remove(file)
+        save_image(image, 'awards', 'awards')
+        return 'Ok.', 200
+    except:
+        return 'There was an internal server error', 500
 
 
 def change_file_name(old_name, new_name):
@@ -185,7 +207,6 @@ def retrieve_image(image_name, image_type):
 def remove_image(image_name, image_type):
     image_path = current_app.config['UPLOAD_FOLDER'] + 'images\\' + image_type + '\\'
     image_name = [name for name in os.listdir(image_path) if image_name.replace(' ', '_') in name]
-    print(image_name)
     os.remove(image_path + image_name[0])
 
 
@@ -193,3 +214,7 @@ def remove_resume():
     resume_path = current_app.config['UPLOAD_FOLDER'] + 'resume\\'
     resume_name = [name for name in os.listdir(resume_path) if 'resume' in name]
     os.remove(resume_path + resume_name[0])
+    
+    
+def there_is_info():
+    return len(Info.query.all()) > 0
