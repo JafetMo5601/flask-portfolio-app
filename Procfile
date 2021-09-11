@@ -1,1 +1,1 @@
-web: python wsgi.py --enable-prod
+web: gunicorn wsgi:main --enable-prod --log-file
