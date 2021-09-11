@@ -1,7 +1,5 @@
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from pymongo import MongoClient
 from flask import Flask
 import argparse
 
