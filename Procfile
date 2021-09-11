@@ -1,1 +1,1 @@
-web: gunicorn wsgi:main --enable-prod
+web: python wsgi.py --enable-prod
