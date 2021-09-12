@@ -161,7 +161,7 @@ def save_image(image, image_type, image_name):
         image_path = Path(current_app.config['UPLOAD_FOLDER'], 'images', image_type)
         image_path = Path(image_path, image_name)
         print(image_path)
-        image.save(str(image_path))
+        image.save(image_path)
         return str(image_path)
     else:
         return ''
@@ -174,8 +174,7 @@ def save_resume(resume):
         resume_name = change_file_name(
             secure_filename(resume.filename), 'resume')
         resume_path = Path(resume_path, resume_name)
-        print(resume_path)
-        resume.save(str(resume_path))
+        resume.save(resume_path)
         return str(resume_path)
     else:
         return ''
@@ -222,7 +221,7 @@ def remove_image(image_name, image_type):
     image_name = [name for name in os.listdir(
         image_path) if image_name.replace(' ', '_') in name]
     print(Path(image_path, image_name[0]))
-    os.remove(str(Path(image_path, image_name[0])))
+    os.remove(Path(image_path, image_name[0]))
 
 
 def remove_resume():
@@ -230,7 +229,7 @@ def remove_resume():
     print(resume_path)
     resume_name = [name for name in os.listdir(
         resume_path) if 'resume' in name]
-    os.remove(str(Path(resume_path, resume_name[0])))
+    os.remove(Path(resume_path, resume_name[0]))
 
 
 def there_is_info():
