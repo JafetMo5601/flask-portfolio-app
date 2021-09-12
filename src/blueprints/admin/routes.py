@@ -97,7 +97,8 @@ def add_award():
 def update_award(id):
     title = request.json['title']
     description = request.json['description']
-    response = admin.update_award(id, title, description)
+    year = request.json['year']
+    response = admin.update_award(id, title, description, year)
     return jsonify(response=response[0]), response[1]
 
 
