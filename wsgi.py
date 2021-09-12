@@ -7,7 +7,7 @@ if (os.getenv('ENVIRONMENT', 'prod') == 'dev'):
     api = create_api(DevConfig)
     host = '127.0.0.1'
 else: 
-    api = create_api(ProdConfig)
+    api = create_api(DevConfig)
     host = '0.0.0.0'
 
     
