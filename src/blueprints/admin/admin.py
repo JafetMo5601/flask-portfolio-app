@@ -20,10 +20,13 @@ def add_info(
             cover_path = save_image(cover, 'info', 'cover')
             photo_path = save_image(photo, 'info', 'photo')
             resume_path = save_resume(resume)
+            print('HEREEEEEEEEEEE 1')
             info = Info(
                 about=about, description=description, cover=cover_path, photo=photo_path, resume_path=resume_path, phone=phone, email=email, direction=direction, linkedin_url=linkedin, github_url=gh, instagram_url=insta, facebook_url=fb)
             db.session.add(info)
+            print('HEREEEEEEEEEEE 2')
             db.session.commit()
+            print('HEREEEEEEEEEEE 3')
             return 'Ok.', 200
         else:
             return 'Conflict.', 409
@@ -161,7 +164,7 @@ def save_image(image, image_type, image_name):
         image_path = Path(current_app.config['UPLOAD_FOLDER'], 'images', image_type)
         image_path = Path(image_path, image_name)
         print(image_path)
-        image.save(image_path)
+        image.save(str(image_path))
         return str(image_path)
     else:
         return ''
@@ -174,7 +177,7 @@ def save_resume(resume):
         resume_name = change_file_name(
             secure_filename(resume.filename), 'resume')
         resume_path = Path(resume_path, resume_name)
-        resume.save(resume_path)
+        resume.save(str(resume_path))
         return str(resume_path)
     else:
         return ''
