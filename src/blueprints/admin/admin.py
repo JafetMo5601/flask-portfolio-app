@@ -158,30 +158,33 @@ def save_image(image, image_type, image_name):
     if image and image.filename != '':
         image_name = change_file_name(secure_filename(
             image.filename), image_name.replace(' ', '_'))
-        image_path = Path(current_app.config['UPLOAD_FOLDER'] / 'images' / image_type)
-        image_path = str(Path(image_path / image_name))
-        image.save(image_path)
+        image_path = Path(current_app.config['UPLOAD_FOLDER'], 'images', image_type)
+        image_path = Path(image_path, image_name)
+        print(image_path)
+        image.save(str(image_path))
         return str(image_path)
     else:
         return ''
 
 
 def save_resume(resume):
-    resume_path = Path(current_app.config['UPLOAD_FOLDER'] / 'resume')
+    resume_path = Path(current_app.config['UPLOAD_FOLDER'], 'resume')
 
     if resume and resume.filename != '':
         resume_name = change_file_name(
             secure_filename(resume.filename), 'resume')
-        resume_path = str(resume_path / resume_name)
-        resume.save(resume_path)
-        return resume_path
+        resume_path = Path(resume_path, resume_name)
+        print(resume_path)
+        resume.save(str(resume_path))
+        return str(resume_path)
     else:
         return ''
 
 
 def add_award_cover(image):
     try:
-        awards_path = str(Path(current_app.config['UPLOAD_FOLDER'] / 'images/awards/'))
+        awards_path = Path(current_app.config['UPLOAD_FOLDER'], 'images', 'awards')
+        print(awards_path)
         if len(os.listdir(awards_path)) > 1:
             file = [file for file in os.listdir(
                 awards_path) if 'awards' in file]
@@ -198,32 +201,36 @@ def change_file_name(old_name, new_name):
 
 
 def retrieve_resume():
-    resume_path = Path(current_app.config['UPLOAD_FOLDER'] / 'resume/')
+    resume_path = Path(current_app.config['UPLOAD_FOLDER'], 'resume')
     resume_name = [name for name in os.listdir(resume_path) if 'resume' in name]
-    resume_path = str(resume_path / resume_name[0])
-    return resume_path
+    resume_path = Path(resume_path, resume_name[0])
+    print(resume_path)
+    return str(resume_path)
 
 
 def retrieve_image(image_name, image_type):
-    image_path = Path(current_app.config['UPLOAD_FOLDER'] / 'images' / image_type)
+    image_path = Path(current_app.config['UPLOAD_FOLDER'], 'images', image_type)
     image_name = [name for name in os.listdir(
         image_path) if image_name.replace(' ', '_') in name]
-    image_path = str(image_path / image_name[0])
-    return image_path
+    image_path = Path(image_path, image_name[0])
+    print(image_path)
+    return str(image_path)
 
 
 def remove_image(image_name, image_type):
-    image_path = Path(current_app.config['UPLOAD_FOLDER'] / 'images' / image_type)
+    image_path = Path(current_app.config['UPLOAD_FOLDER'], 'images', image_type)
     image_name = [name for name in os.listdir(
         image_path) if image_name.replace(' ', '_') in name]
-    os.remove(str(image_path / image_name[0]))
+    print(Path(image_path, image_name[0]))
+    os.remove(str(Path(image_path, image_name[0])))
 
 
 def remove_resume():
-    resume_path = Path(current_app.config['UPLOAD_FOLDER'] / 'resume/')
+    resume_path = Path(current_app.config['UPLOAD_FOLDER'], 'resume')
+    print(resume_path)
     resume_name = [name for name in os.listdir(
         resume_path) if 'resume' in name]
-    os.remove(str(resume_path / resume_name[0]))
+    os.remove(str(Path(resume_path, resume_name[0])))
 
 
 def there_is_info():
