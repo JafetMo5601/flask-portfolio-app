@@ -1,3 +1,4 @@
+from pathlib import Path
 import os
 
 
@@ -7,7 +8,7 @@ class Config(object):
     JWT_SECRET_KEY = SECRET_KEY
     SQLALCHEMY_DATABASE_URI = 'sqlite:///portfolio.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    UPLOAD_FOLDER = os.path.join(os.getcwd(), 'src\\files_storage\\')
+    UPLOAD_FOLDER = Path(os.getcwd()) / 'src/files_storage/'
     
 class DevConfig(Config):
     DEBUG = True
