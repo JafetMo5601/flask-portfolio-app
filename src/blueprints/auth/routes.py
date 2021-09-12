@@ -15,7 +15,7 @@ def register():
         first = request.json['first']
         last = request.json['last']
         password = request.json['password']
-        auth.is_email_registered(first, last, email, password)
+        auth.register_user(first, last, email, password)
         return jsonify(response = 'Created.', message='User registered sucessfully'), 201
 
 
