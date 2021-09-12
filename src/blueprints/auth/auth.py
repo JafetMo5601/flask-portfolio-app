@@ -6,7 +6,7 @@ def is_email_registered(email):
     return db.session.query(User.id).filter_by(email=email).first() is not None
 
 
-def register_user(fist, last, email, password):
+def register_user(first, last, email, password):
     user = User(first=first, last=last, email=email, password=password)
     db.session.add(user)
     db.session.commit()
